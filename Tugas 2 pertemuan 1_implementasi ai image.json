@@ -1,0 +1,331 @@
+{
+  "name": "Tugas 2 pertemuan 1",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Generate Gambar Konten 0tomatis",
+        "formDescription": "Isi informasi dibawah ini untuk memulai generate gambar",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "prompt"
+            },
+            {
+              "fieldLabel": "task_type",
+              "placeholder": "mj_txt2img"
+            },
+            {
+              "fieldLabel": "api_key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7a6d8e2b-1307-4555-b930-96599106d6b2",
+      "name": "On form submission",
+      "webhookId": "3a5931c8-4e86-4c11-bdda-1abd9e4276a6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer 460b7020013666c39ff7e3f9a62db1f6"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"grok-imagine/text-to-image\",\n  \"input\": {\n    \"prompt\": \"{{$json.prompt.replace(/\"/g, '\\\\\"')}}\", \n    \"aspect_ratio\": \"3:2\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "863198a6-f448-46b4-9588-e53bd09ffe61",
+      "name": "Mengirim image generation request ke KIE.AI API"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        0
+      ],
+      "id": "9374ed37-d631-41a4-b077-4eb2b986a938",
+      "name": "Menunggu proses generate gambar",
+      "webhookId": "15a8ea71-3e8c-40da-910b-9be6ef9d01e9"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{$node[\"Menunggu proses generate gambar\"].json[\"data\"][\"taskId\"]}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"On form submission\"].json[\"api_key\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        592,
+        0
+      ],
+      "id": "bfdc4cbd-4e0a-442f-a533-29308dd97b14",
+      "name": "Mendapatkan status generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($json.data.resultJson);\n\nreturn [{\n  img1: result.resultUrls[0] || null,\n  img2: result.resultUrls[1] || null,\n  img3: result.resultUrls[2] || null,\n  img4: result.resultUrls[3] || null\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "4c752300-d95c-47b6-b4f0-050b3bad2b27",
+      "name": "Format result"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urls = [\n  $json.img1,\n  $json.img2,\n  $json.img3,\n  $json.img4\n].filter(Boolean);\n\n// jadikan 1 URL = 1 item\nreturn urls.map((url, index) => ({\n  json: {\n    url,\n    index: index + 1\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -16
+      ],
+      "id": "a82e8eb7-b0bf-4938-8a95-aa90276b62ba",
+      "name": "Loop image"
+    },
+    {
+      "parameters": {
+        "url": "={{$json[\"url\"]}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1408,
+        -16
+      ],
+      "id": "645bf87d-c5a3-4750-bdbc-8450608e6c94",
+      "name": "Download gambar"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "1231278382",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        -16
+      ],
+      "id": "1ad76e8a-2ab7-44a4-b9e6-e6ad35c4eb3a",
+      "name": "Kirim hasil gambar",
+      "webhookId": "e725e1b7-44f9-49a3-907f-798ec8944095",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "957df2be-fe46-4cd2-b64e-02b11f8afa65",
+              "leftValue": "={{$json[\"data\"] && $json[\"data\"][\"state\"]}}",
+              "rightValue": "=success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "36b2c7ef-e0b3-4647-9154-baba8db618af",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Mengirim image generation request ke KIE.AI API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mengirim image generation request ke KIE.AI API": {
+      "main": [
+        [
+          {
+            "node": "Menunggu proses generate gambar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menunggu proses generate gambar": {
+      "main": [
+        [
+          {
+            "node": "Mendapatkan status generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mendapatkan status generate": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format result": {
+      "main": [
+        [
+          {
+            "node": "Loop image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop image": {
+      "main": [
+        [
+          {
+            "node": "Download gambar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download gambar": {
+      "main": [
+        [
+          {
+            "node": "Kirim hasil gambar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Format result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menunggu proses generate gambar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "28f819c5-d1ef-46e8-bdfd-dc5d4cc67c37",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef4c1b6463e8579273ec8c5ddc711ec694a363f603e1c02f0d905d2705a13425"
+  },
+  "id": "MIthJbOFKjOjxMfg",
+  "tags": []
+}
