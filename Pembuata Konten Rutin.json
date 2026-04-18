@@ -1,0 +1,927 @@
+{
+  "name": "Pembuata Konten Rutin",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6a57557e-caf8-4717-b30f-a712dc95070c",
+      "name": "Telegram Trigger",
+      "webhookId": "98c20754-ec07-42c0-a5fa-a225286320aa",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.from.id }}",
+        "text": "egskuy sedang memproses request Anda, harap tunggu sebentar.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        208
+      ],
+      "id": "4d09bac7-4733-4546-a0f3-e92634bc2093",
+      "name": "Respon Cepat",
+      "webhookId": "4dcf282f-3949-4e31-a36f-cdad6c32aac2",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "8e161443-4113-4ccc-96af-3de13896bb67"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "91f707e7-d7d4-4c41-82b4-4593f7782945",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "Title",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "261f0d61-054c-43ac-a6eb-baf5dfc2ddfd",
+                    "leftValue": "={{ $json.message.caption }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -16
+      ],
+      "id": "5adf3232-08f7-4c38-8dea-61dc46fd6fa7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e3dab79f-6f6b-499b-bac4-8ce1c5b27e78",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        -208
+      ],
+      "id": "ac36741f-31b7-405f-8bb1-1495f5cba6eb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "Harap ketik/start untuk memulai.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        816,
+        -448
+      ],
+      "id": "2e839846-f264-4850-8433-2db051855648",
+      "name": "Format Salah (False)",
+      "webhookId": "9127dc58-a930-4d05-9583-dfc31fe8e405",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68e61163-8979-4d4d-9fbb-13cd7a008ff6",
+              "name": "tanggal",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "861f45eb-87c9-4bca-81de-1e1571419efc",
+              "name": "tema",
+              "value": "Teknologi & Produktivitas",
+              "type": "string"
+            },
+            {
+              "id": "c10273e3-67a3-4939-ace2-bbf7e835fd4c",
+              "name": "waktu",
+              "value": "={{ $json['Readable time'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        -224
+      ],
+      "id": "1cfd8908-aff9-4036-bfed-ff2c99037bd6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Buat rencana konten harian untuk {{ $json .tanggal }} dengan tema {{ $json.tema }}\n\nSaya mau Anda buatnya dalam bentuk nomor atau point",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1152,
+        -224
+      ],
+      "id": "a5878005-18cf-4a0a-8af4-c09db3b0a052",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n\t\"time_slot\": \"\",\n    \"title\": \"\",\n\t\"platforms\": [],\n    \"focus\": \"\",\n    \"ideas\": []\n  }\n]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        -384
+      ],
+      "id": "3a1b9245-8a45-471b-a8d0-37dcda57fdd6",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dace3e50-fded-45b9-8567-a111ca5ef179",
+              "name": "time_slot",
+              "value": "={{ $json.output[0].time_slot }}",
+              "type": "string"
+            },
+            {
+              "id": "4e485a1d-2e19-48db-8bb6-66487ac93195",
+              "name": "title",
+              "value": "={{ $json.output[0].title }}",
+              "type": "string"
+            },
+            {
+              "id": "240b0fe8-8158-4f0d-8687-eada783cbb41",
+              "name": "platforms",
+              "value": "={{ $json.output[0].platforms }}",
+              "type": "string"
+            },
+            {
+              "id": "9bb2636d-2ad3-4feb-9ae6-ec817ff3e303",
+              "name": "focus",
+              "value": "={{ $json.output[0].focus }}",
+              "type": "string"
+            },
+            {
+              "id": "50084ccf-0103-430a-bf4e-c90f6d6a018b",
+              "name": "ide",
+              "value": "={{ $json.output[0].ideas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        -656
+      ],
+      "id": "ac8f4caf-3c2d-49f8-b2a9-6a2d144f2295",
+      "name": "Output 1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dace3e50-fded-45b9-8567-a111ca5ef179",
+              "name": "time_slot",
+              "value": "={{ $json.output[3].time_slot }}",
+              "type": "string"
+            },
+            {
+              "id": "4e485a1d-2e19-48db-8bb6-66487ac93195",
+              "name": "title",
+              "value": "={{ $json.output[3].title }}",
+              "type": "string"
+            },
+            {
+              "id": "240b0fe8-8158-4f0d-8687-eada783cbb41",
+              "name": "platforms",
+              "value": "={{ $json.output[3].platforms }}",
+              "type": "string"
+            },
+            {
+              "id": "9bb2636d-2ad3-4feb-9ae6-ec817ff3e303",
+              "name": "focus",
+              "value": "={{ $json.output[3].focus }}",
+              "type": "string"
+            },
+            {
+              "id": "50084ccf-0103-430a-bf4e-c90f6d6a018b",
+              "name": "ide",
+              "value": "={{ $json.output[3].ideas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        -224
+      ],
+      "id": "4274802c-be80-4e43-adf0-9d6b582b7884",
+      "name": "Output 4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dace3e50-fded-45b9-8567-a111ca5ef179",
+              "name": "time_slot",
+              "value": "={{ $json.output[2].time_slot }}",
+              "type": "string"
+            },
+            {
+              "id": "4e485a1d-2e19-48db-8bb6-66487ac93195",
+              "name": "title",
+              "value": "={{ $json.output[2].title }}",
+              "type": "string"
+            },
+            {
+              "id": "240b0fe8-8158-4f0d-8687-eada783cbb41",
+              "name": "platforms",
+              "value": "={{ $json.output[2].platforms }}",
+              "type": "string"
+            },
+            {
+              "id": "9bb2636d-2ad3-4feb-9ae6-ec817ff3e303",
+              "name": "focus",
+              "value": "={{ $json.output[2].focus }}",
+              "type": "string"
+            },
+            {
+              "id": "50084ccf-0103-430a-bf4e-c90f6d6a018b",
+              "name": "ide",
+              "value": "={{ $json.output[2].ideas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        -368
+      ],
+      "id": "d63e56aa-2589-48d3-acea-e99f2321f812",
+      "name": "Output 3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dace3e50-fded-45b9-8567-a111ca5ef179",
+              "name": "time_slot",
+              "value": "={{ $json.output[1].time_slot }}",
+              "type": "string"
+            },
+            {
+              "id": "4e485a1d-2e19-48db-8bb6-66487ac93195",
+              "name": "title",
+              "value": "={{ $json.output[1].title }}",
+              "type": "string"
+            },
+            {
+              "id": "240b0fe8-8158-4f0d-8687-eada783cbb41",
+              "name": "platforms",
+              "value": "={{ $json.output[1].platforms }}",
+              "type": "string"
+            },
+            {
+              "id": "9bb2636d-2ad3-4feb-9ae6-ec817ff3e303",
+              "name": "focus",
+              "value": "={{ $json.output[1].focus }}",
+              "type": "string"
+            },
+            {
+              "id": "50084ccf-0103-430a-bf4e-c90f6d6a018b",
+              "name": "ide",
+              "value": "={{ $json.output[1].ideas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        -512
+      ],
+      "id": "78b73a60-6987-4e12-9713-c8bd637adfeb",
+      "name": "Output 2"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1856,
+        -304
+      ],
+      "id": "b1dfea16-58bd-4a0c-a302-e0ebcaafc3c1",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "chatId": "1231278382",
+        "text": "=Title: {{ $json.title }}\n\nPlatform: {{ $json.platforms }}\n\nIde: {{ $json.ide }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2064,
+        -272
+      ],
+      "id": "20530480-41aa-4aab-bf80-e73698c374ff",
+      "name": "Kirim Ide ke Tim",
+      "webhookId": "7eaed889-75a6-4251-b2d4-9adaeb8ece28",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        0
+      ],
+      "id": "02dc7103-d521-4429-aefa-5dc8328ccfa7",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tL59UZwgXkcJjlhE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        0
+      ],
+      "id": "25ed3c48-b204-4d5d-8291-410ff6e4af91",
+      "name": "Kirim Gambar",
+      "webhookId": "2a748d1f-b126-4190-9219-565883d79cbc",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[0].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        256
+      ],
+      "id": "0f153754-7c75-45f5-9709-f9aeabecd552",
+      "name": "Get a file",
+      "webhookId": "99b59eb5-7e7a-4e5e-8f4a-339aa1a768ca",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        256
+      ],
+      "id": "c3e91526-815a-4eeb-a6af-a1bdc8729358",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "items.forEach(item => {\n  // Pastikan item memiliki field 'data' berupa string base64\n  if (item.json && item.json.data) {\n    const base64String = item.json.data;\n\n    // Konversi base64 ke Buffer\n    const buffer = Buffer.from(base64String, 'base64');\n\n    // Simpan ke properti binary\n    item.binary = {\n      data: {\n        data: buffer,\n        fileName: 'image.jpg',\n        mimeType: 'image/jpeg'\n      }\n    };\n  }\n});\n\n// WAJIB ADA INI\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        256
+      ],
+      "id": "3c220be8-c255-4e0c-923b-3b56f1d51a92",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        256
+      ],
+      "id": "fe473055-2b20-4545-a374-1acd5c3ad88c",
+      "name": "Send a video",
+      "webhookId": "7b1b90e2-8b9f-4223-ae94-5579301de767",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -384
+      ],
+      "id": "224c0891-cecc-4543-a76c-641beb6b1b9f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "K7FdyMGKk5i0kaUF",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analyze the image and generate a detailed, cinematic video prompt suitable for Google VEO-3.1. Include:\n- Subject and action (e.g., \"a cat jumping on a sofa\")\n- Setting and background\n- Time of day, lighting, mood\n- Camera movement (e.g., slow zoom, tracking shot)\n- Visual style (e.g., photorealistic, cartoon, cinematic)\n\nKeep it concise (1–2 sentences). Output ONLY the prompt text, no explanation.\n",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1296,
+        256
+      ],
+      "id": "3217f3e7-835f-44b9-b008-9cb7811e4a00",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tL59UZwgXkcJjlhE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "modelId": {
+          "__rl": true,
+          "value": "models/veo-3.1-fast-generate-preview",
+          "mode": "list",
+          "cachedResultName": "models/veo-3.1-fast-generate-preview"
+        },
+        "prompt": "={{ $json.content.parts[0].text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        256
+      ],
+      "id": "e393203f-5990-4455-aa2d-650438c80644",
+      "name": "Generate a video",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tL59UZwgXkcJjlhE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Respon Cepat",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Salah (False)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Output 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Output 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Output 3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Output 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output 4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Output 3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Output 2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Output 1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Kirim Ide ke Tim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Kirim Gambar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Generate a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate a video": {
+      "main": [
+        [
+          {
+            "node": "Send a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "92de0ed8-803a-4ca0-bca6-f05cf714c85c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef4c1b6463e8579273ec8c5ddc711ec694a363f603e1c02f0d905d2705a13425"
+  },
+  "id": "MZmQSiEdzcOUKuFD",
+  "tags": []
+}
