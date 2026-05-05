@@ -1,0 +1,433 @@
+{
+  "name": "Tugas 8 Analisis Sentimen",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2a212935-59cc-4c4c-934c-520335080697",
+      "name": "Tiap 15 menit"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze the sentiment of the following news (Indonesian or English).\n\nTitle: {{ $json.title }}\nContent: {{ $json.contentSnippet || $json.content || \"No content available\" }}\n\nRespond ONLY with ONE word: Positive, Negative, or Neutral.\nDo not add punctuation, explanation, or anything else.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        720,
+        0
+      ],
+      "id": "64cfc299-e645-48df-9664-46fd30d8244c",
+      "name": "Analisis Sentimen"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18_A8D13SGTPitIo2Ncj_9Pw1dnbrosGSGdpc0oc7nus",
+          "mode": "list",
+          "cachedResultName": "$BTC  dan $ETH Sentimen Media Sosial",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18_A8D13SGTPitIo2Ncj_9Pw1dnbrosGSGdpc0oc7nus/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Data Mentah",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18_A8D13SGTPitIo2Ncj_9Pw1dnbrosGSGdpc0oc7nus/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toFormat(\"yyyy-MM-dd HH:mm:ss\") }}",
+            "Sentiment": "=Sentiment: ={{ $json.text.trim() }}",
+            "Judul": "={{ $('Pengambil Data').item.json.title }}",
+            "Isi berita": "={{ $('Pengambil Data').item.json.contentSnippet }}",
+            "Link": "={{ $('Pengambil Data').item.json.link }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Judul",
+              "displayName": "Judul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Isi berita",
+              "displayName": "Isi berita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "2a26e0d0-1c16-4db4-aabc-90fd5949e330",
+      "name": "Penyimpanan Hasil",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ixr03omHR9EgEjzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.slice(0, 5);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "97e4fa4f-0622-4315-ad6b-78ea26d27327",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        608,
+        160
+      ],
+      "id": "c4a2738d-5891-49ba-b785-60767fcf1d77",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "K7FdyMGKk5i0kaUF",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        336
+      ],
+      "id": "cc15d73a-c7d5-4178-bbcf-32a5b3341552",
+      "name": "Tiap Jam 7 Pagi"
+    },
+    {
+      "parameters": {
+        "model": "groq/compound",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        576,
+        512
+      ],
+      "id": "d3bacaf5-3322-4c80-869c-fd2e57c6a7e0",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "K7FdyMGKk5i0kaUF",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.cnbcindonesia.com/market/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1c74b4c6-b42b-4b9f-b515-0c3e292786ba",
+      "name": "Pengambil Data"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18_A8D13SGTPitIo2Ncj_9Pw1dnbrosGSGdpc0oc7nus",
+          "mode": "list",
+          "cachedResultName": "$BTC  dan $ETH Sentimen Media Sosial",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18_A8D13SGTPitIo2Ncj_9Pw1dnbrosGSGdpc0oc7nus/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Data Mentah",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18_A8D13SGTPitIo2Ncj_9Pw1dnbrosGSGdpc0oc7nus/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        336
+      ],
+      "id": "65bb7a2c-672b-4fbf-b3fc-c6958efa71c6",
+      "name": "Baca Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ixr03omHR9EgEjzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Baca Data\");\n\nlet positive = 0;\nlet negative = 0;\nlet neutral = 0;\n\nfor (const item of items) {\n  let sentiment = item.json.Sentiment;\n\n  if (!sentiment) continue;\n\n  // bersihkan data\n  sentiment = sentiment.toString().trim().toLowerCase();\n\n  if (sentiment === 'positive') {\n    positive++;\n  } else if (sentiment === 'negative') {\n    negative++;\n  } else if (sentiment === 'neutral') {\n    neutral++;\n  }\n}\n\nreturn [\n  {\n    json: {\n      total_data: items.length,\n      sentimen_positif: positive,\n      sentimen_negatif: negative,\n      sentimen_netral: neutral\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        336
+      ],
+      "id": "5db590a1-49f8-4e2a-8bbe-e5d37457e53c",
+      "name": "Analisis Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Anda adalah seorang analis sentimen media sosial.\nTuliskan kesimpulan singkat (dalam bahasa Indonesia) untuk laporan Telegram, berdasarkan data berikut:\n\n- - Total Tweet Dianalisis: {{ $json.total_data }}\n- Sentimen Positif: {{ $json.sentimen_positif }}\n- Sentimen Negatif: {{ $json.sentimen_negatif }}\n- Sentimen Netral: {{ $json.sentimen_netral }}\n\nBerikan ringkasan singkat tentang apa arti angka-angka ini (misalnya, \"Sentimen hari ini cenderung positif,\" \"Ada banyak keraguan di pasar,\" dll.).\n\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        656,
+        336
+      ],
+      "id": "e29955e1-0029-4205-b8de-917b9363062e",
+      "name": "Membuat Kesimpulan"
+    },
+    {
+      "parameters": {
+        "chatId": "1231278382",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        336
+      ],
+      "id": "bd64fbfd-6ec9-488f-be4f-648b4201104a",
+      "name": "Kirim Laporan",
+      "webhookId": "569828fd-454b-4c4c-9eef-fbc0102c7ce1",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Tiap 15 menit": {
+      "main": [
+        [
+          {
+            "node": "Pengambil Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analisis Sentimen": {
+      "main": [
+        [
+          {
+            "node": "Penyimpanan Hasil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Analisis Sentimen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analisis Sentimen",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tiap Jam 7 Pagi": {
+      "main": [
+        [
+          {
+            "node": "Baca Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Membuat Kesimpulan",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pengambil Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Data": {
+      "main": [
+        [
+          {
+            "node": "Analisis Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analisis Data": {
+      "main": [
+        [
+          {
+            "node": "Membuat Kesimpulan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Membuat Kesimpulan": {
+      "main": [
+        [
+          {
+            "node": "Kirim Laporan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "99a852b2-8f39-480b-bac5-e1e30258b4d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef4c1b6463e8579273ec8c5ddc711ec694a363f603e1c02f0d905d2705a13425"
+  },
+  "id": "uZBAe72LPalns0Oe",
+  "tags": []
+}
