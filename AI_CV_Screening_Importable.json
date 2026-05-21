@@ -1,0 +1,350 @@
+{
+  "name": "BNSP",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1WLM0-kKsnbThadQJeRUqZAbu6RkC6bhs",
+          "mode": "list",
+          "cachedResultName": "CV KANDIDAT",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WLM0-kKsnbThadQJeRUqZAbu6RkC6bhs"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "fc150ebe-05f7-4829-b897-a94f8d720cb1",
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1248,
+        112
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "crRjruA6OSW0bK2s",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "0c0a0f5b-4405-463c-9a3e-58c3a3ed7fa1",
+      "name": "Download CV",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1008,
+        112
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "crRjruA6OSW0bK2s",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "55e30da1-8b21-4822-85bc-aa380937d6a5",
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let data;\n\n// Ambil output dari Gemini\nconst raw =\n  $json.output ||\n  $json.text ||\n  $json.response ||\n  $json.content ||\n  '';\n\n// Bersihkan markdown JSON jika ada\nconst cleaned = raw\n  .replace(/```json/g, '')\n  .replace(/```/g, '')\n  .trim();\n\ntry {\n  // Parse JSON dari AI\n  data = JSON.parse(cleaned);\n\n} catch (error) {\n\n  // Jika gagal parse\n  data = {\n    candidate_name: 'Unknown',\n    skills: ['Unknown'],\n    score: 50,\n    recommendation: 'Perlu Review',\n    summary: cleaned\n  };\n}\n\n// Return hasil final\nreturn [\n  {\n    json: {\n      candidate_name: data.candidate_name || 'Unknown',\n      skills: Array.isArray(data.skills)\n        ? data.skills.join(', ')\n        : data.skills || 'Unknown',\n\n      score: data.score || 0,\n\n      recommendation:\n        data.recommendation || 'Perlu Review',\n\n      summary: data.summary || '',\n\n      upload_date: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "id": "3266f318-3088-465e-ace8-669cebc1d002",
+      "name": "Format Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14TfhB7Fbm2IzvbRE3g2iMF9LCuRe34Zdh_CLCzU6n6E",
+          "mode": "list",
+          "cachedResultName": "Hasil Screening AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14TfhB7Fbm2IzvbRE3g2iMF9LCuRe34Zdh_CLCzU6n6E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Candidate Name": "={{$json.candidate_name}}",
+            "Skills": "={{$json.skills}}",
+            "Score": "={{$json.score}}",
+            "Recommendation": "={{$json.recommendation}}",
+            "Summary": "={{$json.summary}}",
+            "Upload Date": "={{$json.upload_date}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Candidate Name",
+              "displayName": "Candidate Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Skills",
+              "displayName": "Skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Upload Date",
+              "displayName": "Upload Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7a7d7d8e-2c2d-4b15-b56e-433ee0b5e2e6",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ixr03omHR9EgEjzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1231278382",
+        "text": "=📄 Kandidat Baru Dianalisis AI\n\n👤 Nama: {{$json.candidate_name}}\n🛠 Skills: {{$json.skills}}\n📊 Score: {{$json.score}}\n✅ Rekomendasi: {{$json.recommendation}}\n\n📝 Summary:\n{{$json.summary}}",
+        "additionalFields": {}
+      },
+      "id": "693d4a44-1340-4544-938d-2a1c4c452057",
+      "name": "Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        0,
+        208
+      ],
+      "webhookId": "641bb3d4-ce14-4243-8b42-720fc69809ca",
+      "credentials": {
+        "telegramApi": {
+          "id": "zKIYflImtALgH2lC",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Anda adalah AI HR Recruitment Assistant.\n\nAnalisis CV kandidat berikut.\n\nTugas:\n1. Identifikasi nama kandidat\n2. Identifikasi skill utama\n3. Berikan score 1-100\n4. Tentukan rekomendasi interview\n5. Buat ringkasan profesional\n\nJawab HANYA dalam JSON valid.\n\nFormat:\n{\n  \"candidate_name\": \"\",\n  \"skills\": [],\n  \"score\": 0,\n  \"recommendation\": \"\",\n  \"summary\": \"\"\n}\n\nCV:\n{input}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "={{ $json.text }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -544,
+        112
+      ],
+      "id": "e971c493-49c2-40a4-9457-32d6903313fe",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        320
+      ],
+      "id": "a68660ba-b0d0-4d33-91fd-7018c32e5a7a",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "K7FdyMGKk5i0kaUF",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download CV": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Result": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Format Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e9b760ae-4659-42ed-a9d5-9be03b433af6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef4c1b6463e8579273ec8c5ddc711ec694a363f603e1c02f0d905d2705a13425"
+  },
+  "id": "WXzgP7zSdJ8pSair",
+  "tags": []
+}
